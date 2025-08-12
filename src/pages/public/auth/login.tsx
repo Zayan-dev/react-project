@@ -1,71 +1,155 @@
-import { useForm, type FieldValues } from "react-hook-form";
-import { BaseInput } from "../../../components/common/form/base-input";
+import { useForm } from "react-hook-form";
 import BaseButton from "../../../components/common/base-button";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "../../../contexts/AuthContext";
+import { useState } from "react";
+import { Eye, EyeOff, Mail, Lock, AlertCircle } from "lucide-react";
+import { Input } from "@heroui/react";
+
+interface LoginFormData {
+  email: string;
+  password: string;
+}
 
 export default function Login() {
-  const { control, handleSubmit } = useForm();
-  const onSubmit = (values: FieldValues) => {
-    console.log("values: ", values);
-  };
-  return (
-    <div className="bg-base-darkGray min-h-screen flex justify-center items-center">
-      <div className="sm:w-1/2 w-[80%] bg-slate-700 gap-8 text-black min-h-24 rounded-base flex flex-col p-4 py-8 items-center">
-        <div className="flex flex-col justify-center items-center">
-          <h2 className="text-3xl font-semibold text-base-orange">
-            Welcome Back
-          </h2>
-          <p className="text-white">
-            Sign in to continue to your account
-          </p>
-        </div>
-        <form
-          className="self-start flex flex-col gap-4 w-full"
-          onSubmit={handleSubmit(onSubmit)}
-        >
-          <BaseInput
-            labelPlacement="outside"
-            placeholder="Enter Email"
-            label="Email"
-            type="email"
-            classNames={{
-              label: "!text-white",
-              inputWrapper: "!bg-slate-700 border border-white rounded-base ",
-              input: "!text-white",
-            }}
-            control={control}
-            rules={{ required: "Email is required" }}
-            name="email"
-          />
+  const { control, handleSubmit, formState: { errors } } = useForm<LoginFormData>();
+  const { login } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState("");
 
-          <BaseInput
-            labelPlacement="outside"
-            placeholder="Enter Password"
-            label="Password"
-            type="password"
-            classNames={{
-              label: "!text-white",
-              inputWrapper: "!bg-slate-700 border border-white rounded-base ",
-              input: "!text-white",
-            }}
-            rules={{ required: "Password is required" }}
-            control={control}
-            name="password"
-          />
-          <BaseButton className="!text-white bg-base-orange" type="submit">
-            Login
-          </BaseButton>
-        </form>
-        <div className="mt-4 flex flex-col items-center w-full  gap-4">
-          <p className="flex items-center gap-4 text-base-gray p-4 border-t-1 border-base-gray w-full justify-center">
-            Forgot Password?{" "}
-            <Link
-              className="hover:border-b-2 transition-all  text-base-orange border-base-orange "
-              to={"/forgot-password"}
+  const from = location.state?.from?.pathname || "/home";
+
+  const onSubmit = async (values: LoginFormData) => {
+    setIsLoading(true);
+    setError("");
+    
+    try {
+      const success = await login(values.email, values.password);
+      if (success) {
+        navigate(from, { replace: true });
+      } else {
+        setError("Invalid email or password. Try admin@example.com / password");
+      }
+    } catch (err) {
+      setError("An error occurred during login. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-base-darkGray via-base-black to-base-lighterDarkGray flex justify-center items-center p-4">
+      <div className="w-full max-w-md">
+        {/* Logo/Brand */}
+        <div className="text-center mb-8">
+          <div className="w-16 h-16 bg-base-orange rounded-full flex items-center justify-center mx-auto mb-4">
+            <span className="text-2xl font-bold text-white">M</span>
+          </div>
+          <h1 className="text-2xl font-bold text-white">Mindset Dashboard</h1>
+        </div>
+
+        {/* Login Card */}
+        <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 shadow-2xl border border-white/20">
+          <div className="text-center mb-6">
+            <h2 className="text-2xl font-semibold text-white mb-2">
+              Welcome Back
+            </h2>
+            <p className="text-base-gray">
+              Sign in to continue to your account
+            </p>
+          </div>
+
+          {error && (
+            <div className="mb-6 p-3 bg-red-500/20 border border-red-500/30 rounded-lg flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 text-red-400" />
+              <span className="text-red-300 text-sm">{error}</span>
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            <div>
+              <label className="block text-sm font-medium text-white mb-2">
+                Email Address
+              </label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-base-gray" />
+                <Input
+                  type="email"
+                  placeholder="Enter your email"
+                  className="pl-10 bg-white/10 border-white/20 text-white placeholder:text-base-gray"
+                  {...control.register("email", {
+                    required: "Email is required",
+                    pattern: {
+                      value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                      message: "Invalid email address"
+                    }
+                  })}
+                />
+              </div>
+              {errors.email && (
+                <p className="mt-1 text-sm text-red-400">{errors.email.message}</p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-white mb-2">
+                Password
+              </label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-base-gray" />
+                <Input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Enter your password"
+                  className="pl-10 pr-10 bg-white/10 border-white/20 text-white placeholder:text-base-gray"
+                  {...control.register("password", {
+                    required: "Password is required",
+                    minLength: {
+                      value: 6,
+                      message: "Password must be at least 6 characters"
+                    }
+                  })}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-base-gray hover:text-white transition-colors"
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+              {errors.password && (
+                <p className="mt-1 text-sm text-red-400">{errors.password.message}</p>
+              )}
+            </div>
+
+            <BaseButton
+              type="submit"
+              className="w-full bg-base-orange hover:bg-orange-600 text-white font-medium py-3 rounded-lg transition-all duration-200 transform hover:scale-105"
+              disabled={isLoading}
             >
-              Reset
-            </Link>{" "}
-          </p>
+              {isLoading ? "Signing in..." : "Sign In"}
+            </BaseButton>
+          </form>
+
+          <div className="mt-6 text-center">
+            <Link
+              to="/forgot-password"
+              className="text-base-orange hover:text-orange-400 text-sm transition-colors"
+            >
+              Forgot your password?
+            </Link>
+          </div>
+
+          {/* Demo Credentials */}
+          <div className="mt-6 p-3 bg-white/5 rounded-lg border border-white/10">
+            <p className="text-xs text-center text-base-gray mb-2">Demo Credentials:</p>
+            <p className="text-xs text-center text-white">
+              Email: admin@example.com | Password: password
+            </p>
+          </div>
         </div>
       </div>
     </div>

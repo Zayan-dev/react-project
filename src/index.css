@@ -5,6 +5,15 @@
 
 #root {
   font-family: "Roboto", sans-serif;
+  height: 100vh;
+  overflow-x: hidden;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
 }
 
 input::placeholder {
@@ -17,6 +26,36 @@ textarea::placeholder {
 
 input:-webkit-autofill {
   -webkit-text-fill-color: white !important;
+}
+
+/* Layout fixes */
+.sidebar-fixed {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  z-index: 50;
+}
+
+.main-content {
+  margin-left: 0;
+  transition: margin-left 0.3s ease-in-out;
+}
+
+@media (min-width: 1024px) {
+  .main-content {
+    margin-left: 16rem; /* 256px */
+  }
+}
+
+/* Ensure proper card backgrounds */
+.card-white {
+  background-color: white !important;
+}
+
+/* Smooth transitions */
+.transition-all {
+  transition: all 0.3s ease-in-out;
 }
 
 /* Tailwind v4 theme config */

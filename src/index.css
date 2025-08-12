@@ -1,0 +1,34 @@
+@import "tailwindcss";
+@plugin '../hero.ts';
+@source '../node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}';
+@custom-variant dark (&:is(.dark *));
+
+#root {
+  font-family: "Roboto", sans-serif;
+}
+
+input::placeholder {
+  color: lightgray !important;
+}
+
+textarea::placeholder {
+  color: lightgray !important;
+}
+
+input:-webkit-autofill {
+  -webkit-text-fill-color: white !important;
+}
+
+/* Tailwind v4 theme config */
+@theme {
+  --color-base-darkGray: #030712;
+  --color-base-black: #111111;
+  --color-base-orange: #f26522;
+  --color-base-gray: rgb(202, 204, 208);
+  --color-base-lighterDarkGray: #1f1e1e;
+
+  --color-base-grayOpacity: rgba(24, 21, 23, 0.74);
+  --color-base-home: #141414;
+
+  --radius-base: 4px;
+}

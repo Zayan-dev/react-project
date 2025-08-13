@@ -1,18 +1,23 @@
 import { Card, CardBody, CardHeader, Button, Divider } from "@heroui/react";
 import { Mail, ArrowLeft, Shield } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useForgotPassword } from "../../../services/auth";
 import { BaseInput } from "../../../components/common/form/base-input";
 import { useForm, type FieldValues } from "react-hook-form";
 
 export default function ForgotPassword() {
   const { control, handleSubmit } = useForm();
+  const navigate = useNavigate();
   const { mutate, isPending } = useForgotPassword();
   const onSubmit = (values: FieldValues) => {
     const data = {
       email: values.email,
     };
-    mutate(data);
+    mutate(data, {
+      onSuccess: () => {
+        navigate("/change-password");
+      },
+    });
   };
 
   return (

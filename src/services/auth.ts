@@ -7,7 +7,6 @@ export function useLogin() {
     addToast({
       description: err?.response.data.message || "An error occurred",
     });
-    console.log("err: ", err);
   };
   return useMutation({
     mutationFn: (data: any) => axiosInstance.post("/auth/login", data),
@@ -28,6 +27,10 @@ export function useRefreshToken() {
 }
 
 export function useForgotPassword() {
+  const onSuccess = () => {
+    window.location.href = "/change-password";
+  };
+
   const onError = (error: any) => {
     addToast({
       description: error?.response?.data?.message || "An error occurred",
@@ -37,6 +40,7 @@ export function useForgotPassword() {
     mutationFn: (data: any) =>
       axiosInstance.post("/auth/forgot-password", data),
     onError,
+    onSuccess,
   });
 }
 

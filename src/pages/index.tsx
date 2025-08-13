@@ -6,6 +6,7 @@ import Home from "../components/page-components/home/Home";
 import Users from "../components/page-components/users/Users";
 import ProtectedRoute from "../components/common/ProtectedRoute";
 import PublicRoute from "../components/common/PublicRoute";
+import ChangePassword from "./public/auth/change-password";
 
 export default function RouteComponent() {
   return (
@@ -25,6 +26,14 @@ export default function RouteComponent() {
           element={
             <PublicRoute>
               <ForgotPassword />
+            </PublicRoute>
+          } 
+        />
+        <Route 
+          path="/change-password" 
+          element={
+            <PublicRoute>
+              <ChangePassword />
             </PublicRoute>
           } 
         />

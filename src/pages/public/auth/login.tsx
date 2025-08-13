@@ -16,9 +16,8 @@ export default function Login() {
   } = useForm();
   const { setIsAuthenticated } = useAuth();
   const navigate = useNavigate();
-  const { mutateAsync, isPending: loginLoading, isError } = useLogin();
+  const { mutateAsync, isPending: loginLoading, isError, error } = useLogin();
   const [showPassword, setShowPassword] = useState(false);
-
   const onSubmit = async (values: FieldValues) => {
     const obj = {
       identity: values.identity,
@@ -58,7 +57,7 @@ export default function Login() {
           {isError && (
             <div className="mb-6 p-3 bg-red-500/20 border border-red-500/30 rounded-lg flex items-center gap-2">
               <AlertCircle className="w-4 h-4 text-red-400" />
-              <span className="text-red-300 text-sm">{isError}</span>
+              <span className="text-red-300 text-sm">{error.message}</span>
             </div>
           )}
 
@@ -126,6 +125,7 @@ export default function Login() {
               type="submit"
               className="w-full bg-base-orange hover:bg-orange-600 text-white font-medium py-3 rounded-lg transition-all duration-200 transform hover:scale-105"
               disabled={loginLoading}
+              loading={loginLoading}
             >
               {loginLoading ? "Signing in..." : "Sign In"}
             </BaseButton>
@@ -138,16 +138,6 @@ export default function Login() {
             >
               Forgot your password?
             </Link>
-          </div>
-
-          {/* Demo Credentials */}
-          <div className="mt-6 p-3 bg-white/5 rounded-lg border border-white/10">
-            <p className="text-xs text-center text-base-gray mb-2">
-              Demo Credentials:
-            </p>
-            <p className="text-xs text-center text-white">
-              Email: admin@example.com | Password: password
-            </p>
           </div>
         </div>
       </div>

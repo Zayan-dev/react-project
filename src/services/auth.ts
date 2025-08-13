@@ -8,6 +8,12 @@ export function useLogin() {
   });
 }
 
+export function useLogout() {
+  return useMutation({
+    mutationFn: () => axiosInstance.post("/auth/logout"),
+  });
+}
+
 export function useRefreshToken() {
   return useMutation({
     mutationFn: (data: any) => axiosInstance.post("/auth/tokens", data),

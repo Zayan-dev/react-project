@@ -25,7 +25,7 @@ textarea::placeholder {
 }
 
 input:-webkit-autofill {
-  -webkit-text-fill-color: white !important;
+  -webkit-text-fill-color: black !important;
 }
 
 /* Layout fixes */

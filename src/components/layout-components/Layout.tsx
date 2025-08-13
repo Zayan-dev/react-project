@@ -25,8 +25,10 @@ import {
 } from "lucide-react";
 import mindsetLogo from "../../assets/mindset-logo.png";
 import Cookies from "js-cookie";
+import { useLogout } from "../../services/auth";
 const Layout: React.FC = () => {
   const { setIsAuthenticated } = useAuth();
+  const { mutate } = useLogout();
   const navigate = useNavigate();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -58,7 +60,8 @@ const Layout: React.FC = () => {
     },
   ];
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    mutate();
     Cookies.remove("access-token");
     Cookies.remove("refresh-token");
     setIsAuthenticated(false);

@@ -2,25 +2,21 @@ import { useForm, type FieldValues } from "react-hook-form";
 import BaseButton from "../../../components/common/base-button";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { Eye, EyeOff, Mail, Lock, AlertCircle } from "lucide-react";
+import { Eye, EyeOff, Mail, Lock } from "lucide-react";
 import { Input } from "@heroui/react";
 import { useLogin } from "../../../services/auth";
 import Cookies from "js-cookie";
 import { useAuth } from "../../../contexts/AuthContext";
 
 export default function Login() {
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = useForm();
+  const { control, handleSubmit } = useForm();
   const { setIsAuthenticated } = useAuth();
   const navigate = useNavigate();
-  const { mutateAsync, isPending: loginLoading, isError, error } = useLogin();
+  const { mutateAsync, isPending: loginLoading } = useLogin();
   const [showPassword, setShowPassword] = useState(false);
   const onSubmit = async (values: FieldValues) => {
     const obj = {
-      identity: values.identity,
+      email: values.identity,
       password: values.password,
     };
     const data = await mutateAsync(obj);
@@ -54,13 +50,6 @@ export default function Login() {
             </p>
           </div>
 
-          {isError && (
-            <div className="mb-6 p-3 bg-red-500/20 border border-red-500/30 rounded-lg flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 text-red-400" />
-              <span className="text-red-300 text-sm">{error.message}</span>
-            </div>
-          )}
-
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             <div>
               <label className="block text-sm font-medium text-white mb-2">
@@ -81,9 +70,6 @@ export default function Login() {
                   })}
                 />
               </div>
-              {errors.identity && (
-                <p className="mt-1 text-sm text-red-400">{isError}</p>
-              )}
             </div>
 
             <div>
@@ -116,9 +102,6 @@ export default function Login() {
                   )}
                 </button>
               </div>
-              {errors.password && (
-                <p className="mt-1 text-sm text-red-400">{isError}</p>
-              )}
             </div>
 
             <BaseButton

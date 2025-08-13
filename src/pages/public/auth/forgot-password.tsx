@@ -1,4 +1,11 @@
-import { Card, CardBody, CardHeader, Button, Divider } from "@heroui/react";
+import {
+  Card,
+  CardBody,
+  CardHeader,
+  Button,
+  Divider,
+  addToast,
+} from "@heroui/react";
 import { Mail, ArrowLeft, Shield } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useForgotPassword } from "../../../services/auth";
@@ -15,6 +22,9 @@ export default function ForgotPassword() {
     };
     mutate(data, {
       onSuccess: () => {
+        addToast({
+          description: "Verification code sent to your email",
+        });
         navigate("/change-password");
       },
     });

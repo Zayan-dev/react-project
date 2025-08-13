@@ -1,15 +1,9 @@
 // API Configuration
-export const API_BASEURL = "https://staging.api.mgcfreight.com";
-export const API_TIMEOUT = 10000;
+export const API_BASEURL = "https://api.infinitermis.com";
 
 // Application Configuration
 export const APP_NAME = "Mindset Dashboard";
 export const APP_VERSION = "1.0.0";
-
-// Authentication
-export const AUTH_TOKEN_KEY = "auth_token";
-export const USER_DATA_KEY = "user_data";
-export const TOKEN_EXPIRY_KEY = "token_expiry";
 
 // Routes
 export const ROUTES = {

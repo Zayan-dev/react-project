@@ -1,37 +1,68 @@
-import React, { useState } from 'react';
-import { Image, Button, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Avatar, Badge } from '@heroui/react';
-import { Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
-import { 
-  Home, 
-  Users, 
-  BarChart3, 
-  Settings, 
-  Bell, 
-  Menu, 
-  X, 
-  LogOut, 
+import React, { useState } from "react";
+import {
+  Image,
+  Button,
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+  Avatar,
+  Badge,
+} from "@heroui/react";
+import { Outlet, useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
+import {
+  Home,
+  Users,
+  BarChart3,
+  Settings,
+  Bell,
+  Menu,
+  X,
+  LogOut,
   User,
-  ChevronDown
-} from 'lucide-react';
-import mindsetLogo from '../../assets/mindset-logo.png';
-
+  ChevronDown,
+} from "lucide-react";
+import mindsetLogo from "../../assets/mindset-logo.png";
+import Cookies from "js-cookie";
 const Layout: React.FC = () => {
-  const { user, logout } = useAuth();
+  const { setIsAuthenticated } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const navigation = [
-    { name: 'Dashboard', href: '/home', icon: Home, current: location.pathname === '/home' },
-    { name: 'Users', href: '/users', icon: Users, current: location.pathname === '/users' },
-    { name: 'Analytics', href: '/analytics', icon: BarChart3, current: location.pathname === '/analytics' },
-    { name: 'Settings', href: '/settings', icon: Settings, current: location.pathname === '/settings' },
+    {
+      name: "Dashboard",
+      href: "/home",
+      icon: Home,
+      current: location.pathname === "/home",
+    },
+    {
+      name: "Users",
+      href: "/users",
+      icon: Users,
+      current: location.pathname === "/users",
+    },
+    {
+      name: "Analytics",
+      href: "/analytics",
+      icon: BarChart3,
+      current: location.pathname === "/analytics",
+    },
+    {
+      name: "Settings",
+      href: "/settings",
+      icon: Settings,
+      current: location.pathname === "/settings",
+    },
   ];
 
   const handleLogout = () => {
-    logout();
-    navigate('/login');
+    Cookies.remove("access-token");
+    Cookies.remove("refresh-token");
+    setIsAuthenticated(false);
+    navigate("/login");
   };
 
   const handleNavigation = (href: string) => {
@@ -43,26 +74,24 @@ const Layout: React.FC = () => {
     <div className="flex h-screen bg-gray-50 overflow-hidden">
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
-        <div 
+        <div
           className="fixed inset-0 z-40 lg:hidden bg-black bg-opacity-50"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
       {/* Sidebar */}
-      <aside className={`
+      <aside
+        className={`
         fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-xl transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0
-        ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
-      `}>
+        ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
+      `}
+      >
         <div className="flex flex-col h-full">
           {/* Logo */}
           <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200 bg-white">
             <div className="flex items-center space-x-3">
-              <Image 
-                src={mindsetLogo} 
-                alt="Mindset Logo" 
-                className="w-8 h-8"
-              />
+              <Image src={mindsetLogo} alt="Mindset Logo" className="w-8 h-8" />
               <span className="text-xl font-bold text-gray-900">Mindset</span>
             </div>
             <Button
@@ -85,36 +114,23 @@ const Layout: React.FC = () => {
                   onClick={() => handleNavigation(item.href)}
                   className={`
                     w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200
-                    ${item.current 
-                      ? 'bg-base-orange text-white shadow-md' 
-                      : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+                    ${
+                      item.current
+                        ? "bg-base-orange text-white shadow-md"
+                        : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
                     }
                   `}
                 >
-                  <Icon className={`w-5 h-5 ${item.current ? 'text-white' : 'text-gray-500'}`} />
+                  <Icon
+                    className={`w-5 h-5 ${
+                      item.current ? "text-white" : "text-gray-500"
+                    }`}
+                  />
                   <span>{item.name}</span>
                 </button>
               );
             })}
           </nav>
-
-          {/* User Profile */}
-          <div className="p-4 border-t border-gray-200 bg-white">
-            <div className="flex items-center space-x-3 p-3 rounded-lg bg-gray-50">
-              <Avatar 
-                name={user?.name || 'User'} 
-                className="w-8 h-8 text-sm font-medium"
-              />
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900 truncate">
-                  {user?.name || 'User'}
-                </p>
-                <p className="text-xs text-gray-500 truncate">
-                  {user?.email || 'user@example.com'}
-                </p>
-              </div>
-            </div>
-          </div>
         </div>
       </aside>
 
@@ -136,21 +152,17 @@ const Layout: React.FC = () => {
             {/* Page title */}
             <div className="flex-1 lg:flex-none">
               <h1 className="text-lg font-semibold text-gray-900">
-                {navigation.find(item => item.current)?.name || 'Dashboard'}
+                {navigation.find((item) => item.current)?.name || "Dashboard"}
               </h1>
             </div>
 
             {/* Header actions */}
             <div className="flex items-center space-x-4">
               {/* Notifications */}
-              <Button
-                isIconOnly
-                variant="light"
-                className="relative"
-              >
+              <Button isIconOnly variant="light" className="relative">
                 <Bell className="w-5 h-5" />
-                <Badge 
-                  color="danger" 
+                <Badge
+                  color="danger"
                   size="sm"
                   className="absolute -top-1 -right-1"
                 >
@@ -165,26 +177,29 @@ const Layout: React.FC = () => {
                     variant="light"
                     className="flex items-center space-x-2 px-3 py-2"
                   >
-                    <Avatar 
-                      name={user?.name || 'User'} 
-                      className="w-8 h-8 text-sm"
-                    />
+                    <Avatar name={"User"} className="w-8 h-8 text-sm" />
                     <span className="hidden sm:block text-sm font-medium text-gray-700">
-                      {user?.name || 'User'}
+                      {"User"}
                     </span>
                     <ChevronDown className="w-4 h-4 text-gray-500" />
                   </Button>
                 </DropdownTrigger>
                 <DropdownMenu aria-label="User actions">
-                  <DropdownItem key="profile" startContent={<User className="w-4 h-4" />}>
+                  <DropdownItem
+                    key="profile"
+                    startContent={<User className="w-4 h-4" />}
+                  >
                     Profile
                   </DropdownItem>
-                  <DropdownItem key="settings" startContent={<Settings className="w-4 h-4" />}>
+                  <DropdownItem
+                    key="settings"
+                    startContent={<Settings className="w-4 h-4" />}
+                  >
                     Settings
                   </DropdownItem>
-                  <DropdownItem 
-                    key="logout" 
-                    color="danger" 
+                  <DropdownItem
+                    key="logout"
+                    color="danger"
                     startContent={<LogOut className="w-4 h-4" />}
                     onClick={handleLogout}
                   >

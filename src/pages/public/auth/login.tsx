@@ -1,42 +1,35 @@
-import { useForm } from "react-hook-form";
+import { useForm, type FieldValues } from "react-hook-form";
 import BaseButton from "../../../components/common/base-button";
-import { Link, useNavigate, useLocation } from "react-router-dom";
-import { useAuth } from "../../../contexts/AuthContext";
+import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { Eye, EyeOff, Mail, Lock, AlertCircle } from "lucide-react";
 import { Input } from "@heroui/react";
-
-interface LoginFormData {
-  email: string;
-  password: string;
-}
+import { useLogin } from "../../../services/auth";
+import Cookies from "js-cookie";
+import { useAuth } from "../../../contexts/AuthContext";
 
 export default function Login() {
-  const { control, handleSubmit, formState: { errors } } = useForm<LoginFormData>();
-  const { login } = useAuth();
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
+  const { setIsAuthenticated } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
-  const [isLoading, setIsLoading] = useState(false);
+  const { mutateAsync, isPending: loginLoading, isError } = useLogin();
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState("");
 
-  const from = location.state?.from?.pathname || "/home";
-
-  const onSubmit = async (values: LoginFormData) => {
-    setIsLoading(true);
-    setError("");
-    
-    try {
-      const success = await login(values.email, values.password);
-      if (success) {
-        navigate(from, { replace: true });
-      } else {
-        setError("Invalid email or password. Try admin@example.com / password");
-      }
-    } catch (err) {
-      setError("An error occurred during login. Please try again.");
-    } finally {
-      setIsLoading(false);
+  const onSubmit = async (values: FieldValues) => {
+    const obj = {
+      identity: values.identity,
+      password: values.password,
+    };
+    const data = await mutateAsync(obj);
+    if (data) {
+      Cookies.set("access-token", data?.data.data.tokens.access_token, {});
+      Cookies.set("refresh-token", data?.data.data.tokens.refresh_token, {});
+      setIsAuthenticated(true);
+      navigate("/home");
     }
   };
 
@@ -62,10 +55,10 @@ export default function Login() {
             </p>
           </div>
 
-          {error && (
+          {isError && (
             <div className="mb-6 p-3 bg-red-500/20 border border-red-500/30 rounded-lg flex items-center gap-2">
               <AlertCircle className="w-4 h-4 text-red-400" />
-              <span className="text-red-300 text-sm">{error}</span>
+              <span className="text-red-300 text-sm">{isError}</span>
             </div>
           )}
 
@@ -80,17 +73,17 @@ export default function Login() {
                   type="email"
                   placeholder="Enter your email"
                   className="pl-10 bg-white/10 border-white/20 text-white placeholder:text-base-gray"
-                  {...control.register("email", {
+                  {...control.register("identity", {
                     required: "Email is required",
                     pattern: {
                       value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                      message: "Invalid email address"
-                    }
+                      message: "Invalid email address",
+                    },
                   })}
                 />
               </div>
-              {errors.email && (
-                <p className="mt-1 text-sm text-red-400">{errors.email.message}</p>
+              {errors.identity && (
+                <p className="mt-1 text-sm text-red-400">{isError}</p>
               )}
             </div>
 
@@ -108,8 +101,8 @@ export default function Login() {
                     required: "Password is required",
                     minLength: {
                       value: 6,
-                      message: "Password must be at least 6 characters"
-                    }
+                      message: "Password must be at least 6 characters",
+                    },
                   })}
                 />
                 <button
@@ -117,20 +110,24 @@ export default function Login() {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 transform -translate-y-1/2 text-base-gray hover:text-white transition-colors"
                 >
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  {showPassword ? (
+                    <EyeOff className="w-4 h-4" />
+                  ) : (
+                    <Eye className="w-4 h-4" />
+                  )}
                 </button>
               </div>
               {errors.password && (
-                <p className="mt-1 text-sm text-red-400">{errors.password.message}</p>
+                <p className="mt-1 text-sm text-red-400">{isError}</p>
               )}
             </div>
 
             <BaseButton
               type="submit"
               className="w-full bg-base-orange hover:bg-orange-600 text-white font-medium py-3 rounded-lg transition-all duration-200 transform hover:scale-105"
-              disabled={isLoading}
+              disabled={loginLoading}
             >
-              {isLoading ? "Signing in..." : "Sign In"}
+              {loginLoading ? "Signing in..." : "Sign In"}
             </BaseButton>
           </form>
 
@@ -145,7 +142,9 @@ export default function Login() {
 
           {/* Demo Credentials */}
           <div className="mt-6 p-3 bg-white/5 rounded-lg border border-white/10">
-            <p className="text-xs text-center text-base-gray mb-2">Demo Credentials:</p>
+            <p className="text-xs text-center text-base-gray mb-2">
+              Demo Credentials:
+            </p>
             <p className="text-xs text-center text-white">
               Email: admin@example.com | Password: password
             </p>

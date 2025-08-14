@@ -1,5 +1,7 @@
 // API Configuration
 export const API_BASEURL = "https://api.infinitermis.com";
+export const MEDIA_URL =
+  "https://infinite-automation.s3.us-west-1.amazonaws.com";
 
 // Application Configuration
 export const APP_NAME = "Mindset Dashboard";

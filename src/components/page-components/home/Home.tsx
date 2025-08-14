@@ -1,52 +1,14 @@
 import { Card, CardBody, CardHeader, Progress, Chip } from "@heroui/react";
-import {
-  Users,
-  TrendingUp,
-  Activity,
-  DollarSign,
-  ArrowUpRight,
-  ArrowDownRight,
-  Calendar,
-  Clock,
-  Settings,
-} from "lucide-react";
+import { Users, DollarSign, Clock, Settings, Activity } from "lucide-react";
+import { useDocStats } from "../../../services/document";
 
+const statsKeys:any = {
+  totalDocs: "Total Docs",
+  completedDocs: "Completed Docs",
+  lossRunHistoryReceived: "Loss Run History Received",
+};
 export default function Home() {
-  const stats = [
-    {
-      title: "Total Users",
-      value: "2,350",
-      change: "+20.1%",
-      changeType: "positive" as const,
-      icon: Users,
-      color: "primary",
-    },
-    {
-      title: "Revenue",
-      value: "$45,231",
-      change: "+15.3%",
-      changeType: "positive" as const,
-      icon: DollarSign,
-      color: "success",
-    },
-    {
-      title: "Active Sessions",
-      value: "1,234",
-      change: "-2.1%",
-      changeType: "negative" as const,
-      icon: Activity,
-      color: "warning",
-    },
-    {
-      title: "Growth Rate",
-      value: "12.5%",
-      change: "+8.2%",
-      changeType: "positive" as const,
-      icon: TrendingUp,
-      color: "secondary",
-    },
-  ];
-
+  const { data, isFetching } = useDocStats();
   const recentActivities = [
     {
       id: 1,
@@ -106,20 +68,21 @@ export default function Home() {
     }
   };
 
+  const docStats = data?.data.data;
+  console.log(docStats);
   return (
     <div className="max-w-7xl mx-auto space-y-6">
       {/* Welcome Section */}
       <div className="bg-gradient-to-r from-base-orange to-orange-600 rounded-2xl p-6 text-white shadow-lg">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <h1 className="text-3xl font-bold mb-2">Welcome back, Admin! 👋</h1>
+            <h1 className="text-3xl font-bold mb-2">Welcome back👋</h1>
             <p className="text-orange-100 text-lg">
               Here's what's happening with your dashboard today.
             </p>
           </div>
           <div className="mt-4 lg:mt-0">
-            <Chip color="default" variant="flat" className="text-base-orange">
-              <Calendar className="w-4 h-4 mr-2" />
+            <Chip color="default" variant="flat" className="text-white">
               {new Date().toLocaleDateString("en-US", {
                 weekday: "long",
                 year: "numeric",
@@ -133,50 +96,29 @@ export default function Home() {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {stats.map((stat, index) => {
-          const Icon = stat.icon;
-          return (
-            <Card
-              key={index}
-              className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-white"
-            >
-              <CardBody className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600 mb-1">
-                      {stat.title}
-                    </p>
-                    <p className="text-2xl font-bold text-gray-900">
-                      {stat.value}
-                    </p>
+        {!isFetching &&
+          Object.entries(docStats).map(([key, value]:any) => {
+            if (key == "_id") return null;
+            return (
+              <Card
+                key={key}
+                className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-white"
+              >
+                <CardBody className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-gray-600 mb-1">
+                        {statsKeys[key]}
+                      </p>
+                      <p className="text-2xl font-bold text-gray-900">
+                        {value}
+                      </p>
+                    </div>
                   </div>
-                  <div className={`p-3 rounded-full bg-${stat.color}-100`}>
-                    <Icon className={`w-6 h-6 text-${stat.color}-600`} />
-                  </div>
-                </div>
-                <div className="flex items-center mt-4">
-                  {stat.changeType === "positive" ? (
-                    <ArrowUpRight className="w-4 h-4 text-green-500 mr-1" />
-                  ) : (
-                    <ArrowDownRight className="w-4 h-4 text-red-500 mr-1" />
-                  )}
-                  <span
-                    className={`text-sm font-medium ${
-                      stat.changeType === "positive"
-                        ? "text-green-600"
-                        : "text-red-600"
-                    }`}
-                  >
-                    {stat.change}
-                  </span>
-                  <span className="text-sm text-gray-500 ml-1">
-                    from last month
-                  </span>
-                </div>
-              </CardBody>
-            </Card>
-          );
-        })}
+                </CardBody>
+              </Card>
+            );
+          })}
       </div>
 
       {/* Charts and Activity Section */}

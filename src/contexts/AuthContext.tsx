@@ -8,11 +8,7 @@ import React, {
 import type { ReactNode } from "react";
 import Cookies from "js-cookie";
 import axiosInstance from "../components/utils/axiosInstance";
-import type {
-  AxiosError,
-  AxiosResponse,
-  InternalAxiosRequestConfig,
-} from "axios";
+import type { AxiosError } from "axios";
 import { useRefreshToken } from "../services/auth";
 
 const AuthContext = createContext<any | undefined>(undefined);
@@ -30,8 +26,8 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const { mutateAsync } = useRefreshToken();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const { data, refetch } = useRefreshToken({ enabled: false });
   const accessToken = Cookies.get("access-token");
 
   useEffect(() => {
@@ -43,12 +39,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useLayoutEffect(() => {
     // Request interceptor
     axiosInstance.interceptors.request.use(
-      (config: InternalAxiosRequestConfig) => {
+      (config: any) => {
         // Add auth token if available
-        const token = Cookies.get("access-token");
-        if (token && config.headers) {
-          config.headers.Authorization = `Bearer ${token}`;
-        }
+        config.headers.Authorization =
+          accessToken && !config._retry
+            ? `Bearer ${accessToken}`
+            : config.headers.Authorization;
 
         // Add request timestamp
         (config as any).metadata = { startTime: new Date() };
@@ -59,25 +55,36 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         return Promise.reject(error);
       }
     );
+  }, [accessToken]);
 
+  useLayoutEffect(() => {
     // Response interceptor
     axiosInstance.interceptors.response.use(
-      (response: AxiosResponse) => {
-        return response;
-      },
-      async (error: AxiosError) => {
-        if (error.message === "Unauthorized") {
-          console.log("object: ", error);
-          const data = await mutateAsync({
-            authorization: Cookies.get("refresh-token"),
-          });
-          if (data) {
-            Cookies.set("access-token", data?.data.accessToken);
-            return error.config;
+      (response: any) => response,
+      async (error: any) => {
+        const originalRequest = error.config;
+
+        if (
+          error?.status == 401 &&
+          originalRequest &&
+          !originalRequest._retry
+        ) {
+          try {
+            await refetch();
+            if (data?.data?.accessToken) {
+              Cookies.set("access-token", data.data.accessToken);
+              originalRequest.headers.Authorization = `Bearer ${data.data.accessToken}`;
+              originalRequest._retry = true; // prevent infinite loop
+              return axiosInstance(originalRequest); // retry the request
+            }
+          } catch (refreshError) {
+            console.error("Refresh token failed", refreshError);
+            setIsAuthenticated(false);
+            Cookies.remove("access-token");
+            Cookies.remove("refresh-token");
           }
         }
 
-        console.log("error : ", error);
         return Promise.reject(error);
       }
     );

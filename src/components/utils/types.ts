@@ -7,6 +7,7 @@ import type {
   TextAreaProps,
   TimeInputProps,
 } from "@heroui/react";
+import type { Dispatch, ReactNode, SetStateAction } from "react";
 import type { Control, FieldValues, RegisterOptions } from "react-hook-form";
 
 // Base Types
@@ -24,7 +25,7 @@ export interface User {
   updatedAt: string;
 }
 
-export type UserRole = 'admin' | 'user' | 'moderator';
+export type UserRole = "admin" | "user" | "moderator";
 
 // Authentication Types
 export interface LoginCredentials {
@@ -141,17 +142,17 @@ export interface DashboardStat {
   title: string;
   value: string | number;
   change: string;
-  changeType: 'positive' | 'negative';
+  changeType: "positive" | "negative";
   icon: React.ComponentType<{ className?: string }>;
   color: string;
 }
 
 export interface ActivityItem {
   id: number;
-  type: 'user' | 'payment' | 'system' | 'alert';
+  type: "user" | "payment" | "system" | "alert";
   message: string;
   time: string;
-  status: 'success' | 'warning' | 'danger' | 'primary';
+  status: "success" | "warning" | "danger" | "primary";
 }
 
 // Table Types
@@ -172,9 +173,9 @@ export interface TableProps<T = any> {
     totalPages: number;
     onPageChange: (page: number) => void;
   };
-  onSort?: (key: keyof T, direction: 'asc' | 'desc') => void;
+  onSort?: (key: keyof T, direction: "asc" | "desc") => void;
   sortBy?: keyof T;
-  sortDirection?: 'asc' | 'desc';
+  sortDirection?: "asc" | "desc";
 }
 
 // Modal Types
@@ -182,7 +183,7 @@ export interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
   title?: string;
-  size?: 'sm' | 'md' | 'lg' | 'xl' | 'full';
+  size?: "sm" | "md" | "lg" | "xl" | "full";
   children: React.ReactNode;
 }
 
@@ -190,10 +191,59 @@ export interface ModalProps {
 export interface ToastOptions {
   title: string;
   description?: string;
-  type?: 'success' | 'error' | 'warning' | 'info';
+  type?: "success" | "error" | "warning" | "info";
   duration?: number;
   action?: {
     label: string;
     onClick: () => void;
   };
 }
+
+export type PaginationMeta = {
+  currentPage: number;
+  itemCount: number;
+  itemsPerPage: number;
+  totalItems: number;
+  totalPages: number;
+};
+
+export type BaseTableColumn = {
+  key: string;
+  label: string;
+  sortable?: boolean;
+};
+
+export interface Meta {
+  totalItems: number;
+  itemCount: number;
+  itemsPerPage: number;
+  totalPages: number;
+  currentPage: number;
+}
+
+export type BaseTableProps = {
+  loading?: boolean;
+  bottomContentPlacement?: any;
+  columns: Array<BaseTableColumn>;
+  data: Array<any>;
+  meta?: PaginationMeta;
+  topContent?: ReactNode;
+  emptyContent?: ReactNode;
+  renderCell?: (item: any, columnKey: string) => ReactNode;
+  pagination?: boolean;
+  setMeta?: Dispatch<SetStateAction<Meta>>;
+  fetchData?: (
+    page: number,
+    pageSize: number,
+    searchQuery?: string,
+    carrierType?: number,
+    country?: string,
+    timeDuration?: number,
+    startTime?: string,
+    endTime?: string,
+    Status?: number,
+    userId?: string
+  ) => Promise<void>;
+  selectMode?: "none" | "single" | "multiple";
+  onSelectionChange?: (selectedKeys: any) => void;
+};

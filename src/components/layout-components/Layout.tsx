@@ -13,8 +13,6 @@ import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import {
   Home,
-  Users,
-  BarChart3,
   Settings,
   Bell,
   Menu,
@@ -22,6 +20,7 @@ import {
   LogOut,
   User,
   ChevronDown,
+  Files,
 } from "lucide-react";
 import mindsetLogo from "../../assets/mindset-logo.png";
 import Cookies from "js-cookie";
@@ -41,22 +40,10 @@ const Layout: React.FC = () => {
       current: location.pathname === "/home",
     },
     {
-      name: "Users",
-      href: "/users",
-      icon: Users,
-      current: location.pathname === "/users",
-    },
-    {
-      name: "Analytics",
-      href: "/analytics",
-      icon: BarChart3,
-      current: location.pathname === "/analytics",
-    },
-    {
-      name: "Settings",
-      href: "/settings",
-      icon: Settings,
-      current: location.pathname === "/settings",
+      name: "All Loss Runs",
+      href: "/documents",
+      icon: Files,
+      current: location.pathname === "/documents",
     },
   ];
 
@@ -197,6 +184,9 @@ const Layout: React.FC = () => {
                   <DropdownItem
                     key="settings"
                     startContent={<Settings className="w-4 h-4" />}
+                    onPress={() => {
+                      navigate("/change-user-password");
+                    }}
                   >
                     Settings
                   </DropdownItem>

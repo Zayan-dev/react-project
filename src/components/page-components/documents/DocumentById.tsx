@@ -94,7 +94,7 @@ export default function DocumentById() {
         <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
           📦 Carriers & Policy History
         </h3>
-        {doc.documentContent?.map((carrierItem: any, idx: number) => (
+        {doc?.documentContent?.map((carrierItem: any, idx: number) => (
           <div key={idx} className="mb-6 border-b pb-4 last:border-none">
             <h4 className="font-bold text-orange-600">{carrierItem.carrier}</h4>
             <div className="mt-2">
@@ -113,7 +113,7 @@ export default function DocumentById() {
             </div>
             {/* Emails */}
             <div className="mt-3 flex flex-wrap gap-2">
-              {carrierItem.email?.map((mail: string, eIdx: number) => (
+              {carrierItem?.email?.map((mail: string, eIdx: number) => (
                 <span
                   key={eIdx}
                   className="px-3 py-1 text-xs bg-gray-100 rounded-full"
@@ -132,8 +132,8 @@ export default function DocumentById() {
           📎 Attachments
         </h3>
         <div className="flex flex-wrap gap-2">
-          {insurance.attachments.length > 0 &&
-            insurance.attachments?.map((file: string, idx: number) => (
+          {insurance?.attachments?.length > 0 &&
+            insurance?.attachments?.map((file: string, idx: number) => (
               <span
                 key={idx}
                 onClick={() => window.open(`${MEDIA_URL}/${file}`, "_blank")}
@@ -151,8 +151,8 @@ export default function DocumentById() {
           📁 Files
         </h3>
         <div className="flex flex-wrap gap-2">
-          {doc.files.length > 0 &&
-            doc.files?.map((file: string, idx: number) => (
+          {doc?.files?.length > 0 &&
+            doc?.files?.map((file: string, idx: number) => (
               <span
                 key={idx}
                 onClick={() => window.open(`${MEDIA_URL}/${file}`, "_blank")}
